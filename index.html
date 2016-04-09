@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+<title>sass,git,angular js,javascript,jquery</title>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"></script>
+
+
+
+
+<script>
+	var myApp = angular.module('myApp',['ngRoute']);
+	myApp.factory('myFactory',function($http){
+		var service = {};
+		service.returnData = function(){
+			var data = $http.get('text.json');
+			return data;
+		}
+		return service;
+	});
+	myApp.controller('myCtrl',['$scope','$http','myFactory',function($scope,$http,myFactory){
+		//to work need to access using http (has to be on remote server)
+		myFactory.returnData().then(function(response){
+			$scope.records = response.data.records;
+		},function(response){
+			$scope.records = response.status;
+		});
+		
+	}]);
+	
+	myApp.controller('homeCtrl',function($scope){
+		$scope.msg = "I am home controller";
+	});
+	
+	myApp.controller('aboutCtrl',function($scope){
+		$scope.msg = "I am about controller";
+	});
+	
+	myApp.config(function($routeProvider){
+		$routeProvider
+		.when('/',{
+			templateUrl : 'pages/home.html',
+			controller : 'homeCtrl'
+		})
+		.when('/about',{
+			templateUrl : 'pages/about.html',
+			controller : 'aboutCtrl'
+		})
+	});
+</script>
+</head>
+<body>
+<div id="controller1" ng-controller="myCtrl">
+<ul class="nav navbar-nav navbar-right">
+<li><a href="#"><i class="fa fa-shield"></i>Home</a></li>
+<li><a href="#about"><i class="fa fa-shield"></i>About</a></li>
+</ul>
+	<input type="text" ng-model="test1"/>
+	<ul>
+		<li ng-repeat="record in records | filter: test1">
+			Name: {{record.Name | uppercase}} <br/>  Country:
+			{{record.Country | lowercase}}
+		</li>
+	</ul>
+	<div ng-view></div>
+</div>
+</body>
+</html>
